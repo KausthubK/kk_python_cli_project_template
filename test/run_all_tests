@@ -1,0 +1,31 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+GRN='\033[0;32m'
+PURPLE='\033[1;35m'
+NC='\033[0m' # No Color
+
+FAILED_TEST_SCRIPTS=0
+PKG_NAME=$(dirname $PWD)
+echo -e "[TEST  ${PURPLE}PKG${NC}] ${PURPLE}${PKG_NAME}${NC}"
+TESTS=(test_*.py)
+for TEST in "${TESTS[@]}"
+do
+  echo "[      RUN] $TEST"
+  python3 "$TEST" &> /dev/null
+  RET=$?
+  if [ "$RET" -ne 0  ]; then
+    echo -e "[     ${RED}FAIL${NC}] ${RED}${TEST}${NC}"
+    let FAILED_TEST_SCRIPTS++
+  else
+    echo -e "[     ${GRN}PASS${NC}] ${GRN}${TEST}${NC}"
+  fi
+done
+
+if [ "$FAILED_TEST_SCRIPTS" -eq 0 ]; then
+    echo -e "[     ${GRN}PASS${NC}] ${GRN}${PKG_NAME}${NC}"
+else
+    echo -e "[${RED}FAIL  ${PURPLE}PKG${NC}] ${RED}${PKG_NAME} (Failed Tests: ${FAILED_TEST_SCRIPTS})${NC}"
+fi
+
+exit "$FAILED_TEST_SCRIPTS"
